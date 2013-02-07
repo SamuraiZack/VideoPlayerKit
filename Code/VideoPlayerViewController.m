@@ -151,7 +151,7 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
 - (void)presentShareOptions
 {
     showShareOptions = NO;
-    [DodgeThis showShareOptionsToShareUrl:[_currentVideoInfo objectForKey:@"shareURL"] title:[_currentVideoInfo objectForKey:@"title"] image:nil onViewController:[[[UIApplication sharedApplication] keyWindow] rootViewController]];
+    [DodgeThis showShareOptionsToShareUrl:[_currentVideoInfo objectForKey:@"shareURL"] title:[_currentVideoInfo objectForKey:@"title"] image:nil onViewController:[[[UIApplication sharedApplication] keyWindow] rootViewController] forTypeOfContent:DTContentTypeVideo];
 }
 
 - (void)shareButtonHandler
@@ -296,7 +296,9 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
                 self.topView.frame = CGRectMake(0, 0, self.videoPlayerView.frame.size.width, self.topView.frame.size.height);
             }
             
-            [self.delegate setFullScreenToggled:self.fullScreenModeToggled];
+            if ([self.delegate respondsToSelector:@selector(setFullScreenToggled:)]) {
+                [self.delegate setFullScreenToggled:self.fullScreenModeToggled];
+            }
         }];
     }
 }
@@ -354,7 +356,9 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
             [[UIApplication sharedApplication] setStatusBarHidden:NO
                                                     withAnimation:UIStatusBarAnimationFade];
             
-            [self.delegate setFullScreenToggled:self.fullScreenModeToggled];
+            if ([self.delegate respondsToSelector:@selector(setFullScreenToggled:)]) {
+                [self.delegate setFullScreenToggled:self.fullScreenModeToggled];
+            }
         }];
     }
 }
@@ -391,7 +395,9 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
         [_videoPlayerView.superview layoutSubviews];
     } else {
         // Have the VideoPlayerVC's parent VC implement rotation trigger
-        [self.delegate setFullScreenToggled:YES];
+        if ([self.delegate respondsToSelector:@selector(setFullScreenToggled:)]) {
+            [self.delegate setFullScreenToggled:self.fullScreenModeToggled];
+        }
     }
 }
 
@@ -401,9 +407,7 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
 }
 
 - (void)videoTapHandler
-{
-    [self.streamStitcherHelper notifyClick];
-    
+{    
     if (_videoPlayerView.playerControlBar.alpha) {
         [self hideControlsAnimated:YES];
     } else {
@@ -418,9 +422,7 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
 
 - (void)setURL:(NSURL *)url
 {
-    NSString *streamStitcherUrl = [NSString stringWithFormat:@"http://hls.v.fwmrm.net/ad/g/1?nw=96749&caid=StreamStitcherDemo&asnw=96749&vdur=186&flag=+sltp+exvt+rema-slcb&prof=96749:hls-cocoa&resp=m3u8;feature=SSHelperDemo&_fw_syncing_token=%@&_fw_lpu=%@;slid=SSNT_1&ptgt=s&w=300&h=250&flag=+cmpn&prct=text/html_doc_lit_mobile,text/html_doc_ref;slid=SSNT_2&ptgt=s&w=728&h=90&flag=+cmpn&prct=text/html_doc_lit_mobile,text/html_doc_ref;", [NSString stringWithFormat:@"%d", arc4random() % 10000000], url.absoluteString];
-    
-    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:[NSURL URLWithString:streamStitcherUrl]];
+    AVPlayerItem *playerItem = [AVPlayerItem playerItemWithURL:url];
     
     [playerItem addObserver:self
                  forKeyPath:@"status"
@@ -470,10 +472,6 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
                                              selector:@selector(playerItemDidReachEnd:)
                                                  name:AVPlayerItemDidPlayToEndTimeNotification
                                                object:self.videoPlayer.currentItem];
-    
-    self.streamStitcherHelper = newStreamStitcherHelperWithUrl([NSURL URLWithString:streamStitcherUrl]);
-
-    [self.streamStitcherHelper setAVPlayer:self.videoPlayer];
 }
 
 // Wait for the video player status to change to ready before initializing video player controls
@@ -492,7 +490,7 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
     if (object != [_videoPlayer currentItem]) {
         return;
     }
-    
+        
     if ([keyPath isEqualToString:@"status"]) {
         AVPlayerStatus status = [[change objectForKey:NSKeyValueChangeNewKey] integerValue];
         switch (status) {
@@ -540,7 +538,6 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
     } else {
         return 0.0f;
     }
-
 }
 
 - (void)playVideo
@@ -550,7 +547,6 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
         scrubBuffering = NO;
         playWhenReady = NO;
         // Configuration is done, ready to start.
-        [self.streamStitcherHelper start];
         [self.videoPlayer play];
         [self updatePlaybackProgress];
     }

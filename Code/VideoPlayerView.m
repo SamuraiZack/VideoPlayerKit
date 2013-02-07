@@ -1,7 +1,6 @@
 /* Copyright (C) 2012 IGN Entertainment, Inc. */
 
 #import "VideoPlayerView.h"
-#import "UIColor+IGNColors.h"
 
 #define PLAYER_CONTROL_BAR_HEIGHT 40
 #define BUTTON_PADDING 8
