@@ -17,6 +17,6 @@ Pod::Spec.new do |s|
 		   'all controls are already set up to make everyone life easier.'
   s.source_files = 'Code/*.{h,m}'
   s.resources    = 'Assets/*.png'
-  s.framework    = 'AudioToolbox', 'CoreMedia', 'AVFoundation', 'MediaPlayer'
+  s.frameworks    = 'AudioToolbox', 'CoreMedia', 'AVFoundation', 'MediaPlayer'
   s.requires_arc = true
 end
