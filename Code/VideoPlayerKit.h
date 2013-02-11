@@ -4,7 +4,7 @@
 #import "VideoPlayer.h"
 #import "VideoPlayerView.h"
 
-@interface VideoPlayerViewController : UIViewController <VideoPlayer>
+@interface VideoPlayerKit : UIViewController <VideoPlayer>
 
 @property (nonatomic, weak) id <VideoPlayerDelegate> delegate;
 @property (readonly, strong) NSDictionary *currentVideoInfo;
@@ -19,9 +19,11 @@
 - (void)playVideoWithTitle:(NSString *)title URL:(NSURL *)url videoID:(NSString *)videoID shareURL:(NSURL *)shareURL isStreaming:(BOOL)streaming playInFullScreen:(BOOL)playInFullScreen;
 - (void)syncFullScreenButton:(UIInterfaceOrientation)toInterfaceOrientation;
 - (void)showCannotFetchStreamError;
-- (id)initWithContainingViewController:(UIViewController *)containingViewController optionalTopView:(UIView *)topView hideTopViewWithControls:(BOOL)hideTopViewWithControls;
 - (void)launchFullScreen;
 - (void)minimizeVideo;
 - (void)playPauseHandler;
++ (VideoPlayerKit *)videoPlayerWithContainingViewController:(UIViewController *)containingViewController
+                                            optionalTopView:(UIView *)topView
+                                    hideTopViewWithControls:(BOOL)hideTopViewWithControls;
 
 @end
