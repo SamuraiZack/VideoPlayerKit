@@ -1,6 +1,6 @@
 /* Copyright (C) 2012 IGN Entertainment, Inc. */
 
-#import "VideoPlayerViewController.h"
+#import "VideoPlayerKit.h"
 #import "FullScreenViewController.h"
 #import "DodgeThis.h"
 
@@ -11,7 +11,7 @@ NSString * const kTrackEventVideoStart = @"Video Start";
 NSString * const kTrackEventVideoLiveStart = @"Video Live Start";
 NSString * const kTrackEventVideoComplete = @"Video Complete";
 
-@interface VideoPlayerViewController () <UIGestureRecognizerDelegate>
+@interface VideoPlayerKit () <UIGestureRecognizerDelegate>
 
 @property (readwrite, strong) NSDictionary *currentVideoInfo;
 
@@ -29,54 +29,75 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
 @property (nonatomic, readwrite) BOOL isPlaying;
 @property (nonatomic, strong) FullScreenViewController *fullscreenViewController;
 @property (nonatomic) CGRect previousBounds;
+@property (nonatomic) BOOL hideTopViewWithControls;
 
 @end
 
-@implementation VideoPlayerViewController {
+@implementation VideoPlayerKit {
     BOOL playWhenReady;
     BOOL scrubBuffering;
     BOOL showShareOptions;
+}
+
+- (void)setTopView:(UIView *)topView
+{
+    _topView = topView;
+    if (self.hideTopViewWithControls) {
+        __weak UIView *weakTopView = _topView;
+        [[NSNotificationCenter defaultCenter] removeObserver:self];
+        
+        [[NSNotificationCenter defaultCenter] addObserverForName:kVideoPlayerWillHideControlsNotification
+                                                          object:self
+                                                           queue:[NSOperationQueue mainQueue]
+                                                      usingBlock:^(NSNotification *note) {
+                                                          [UIView animateWithDuration:0.4f
+                                                                           animations:^{
+                                                                               [weakTopView setAlpha:0.0f];
+                                                                           }];
+                                                      }];
+        
+        [[NSNotificationCenter defaultCenter] addObserverForName:kVideoPlayerWillShowControlsNotification
+                                                          object:self
+                                                           queue:[NSOperationQueue mainQueue]
+                                                      usingBlock:^(NSNotification *note) {
+                                                          [UIView animateWithDuration:0.0f
+                                                                           animations:^{
+                                                                               [weakTopView setAlpha:1.0f];
+                                                                           }];
+                                                      }];
+    }
 }
 
 - (id)initWithContainingViewController:(UIViewController *)containingViewController optionalTopView:(UIView *)topView hideTopViewWithControls:(BOOL)hideTopViewWithControls
 {
     if ((self = [super init])) {
         self.containingViewController = containingViewController;
+        self.hideTopViewWithControls = hideTopViewWithControls;
         self.topView = topView;
-        if (hideTopViewWithControls) {
-            // Notifications to hide/show top views
-            __weak UIView *weakTopView = self.topView;
-            [[NSNotificationCenter defaultCenter] addObserverForName:kVideoPlayerWillHideControlsNotification
-                                                              object:self
-                                                               queue:[NSOperationQueue mainQueue]
-                                                          usingBlock:^(NSNotification *note) {
-                                                              [UIView animateWithDuration:0.4f
-                                                                               animations:^{
-                                                                                   [weakTopView setAlpha:0.0f];
-                                                                               }];
-                                                          }];
-            
-            [[NSNotificationCenter defaultCenter] addObserverForName:kVideoPlayerWillShowControlsNotification
-                                                              object:self
-                                                               queue:[NSOperationQueue mainQueue]
-                                                          usingBlock:^(NSNotification *note) {
-                                                              [UIView animateWithDuration:0.0f
-                                                                               animations:^{
-                                                                                   [weakTopView setAlpha:1.0f];
-                                                                               }];
-                                                          }];
-            
-        }
     }
     
     return self;
 }
 
++ (VideoPlayerKit *)videoPlayerWithContainingViewController:(UIViewController *)containingViewController
+                                                       optionalTopView:(UIView *)topView
+                                               hideTopViewWithControls:(BOOL)hideTopViewWithControls
+{
+    VideoPlayerKit *videoPlayer = [[VideoPlayerKit alloc] initWithContainingViewController:containingViewController
+                                                                           optionalTopView:topView
+                                                                   hideTopViewWithControls:hideTopViewWithControls];
+    
+    return videoPlayer;
+}
+
 - (void)setControlsEdgeInsets:(UIEdgeInsets)controlsEdgeInsets
 {
+    if (!self.videoPlayerView) {
+        self.videoPlayerView = [[VideoPlayerView alloc] initWithFrame:CGRectZero];
+    }
     _controlsEdgeInsets = controlsEdgeInsets;
-    self.videoPlayerView.controlsEdgeInsets = controlsEdgeInsets;
-    
+    self.videoPlayerView.controlsEdgeInsets = _controlsEdgeInsets;
+
     [self.view setNeedsLayout];
 }
 
@@ -100,7 +121,9 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
 
 - (void)loadView
 {
-    self.videoPlayerView = [[VideoPlayerView alloc] initWithFrame:CGRectZero];
+    if (!self.videoPlayerView) {
+        self.videoPlayerView = [[VideoPlayerView alloc] initWithFrame:CGRectZero];
+    }
     self.view = self.videoPlayerView;
 }
 
@@ -628,7 +651,7 @@ NSString * const kTrackEventVideoComplete = @"Video Complete";
 
     CGFloat width = CGRectGetWidth([_videoPlayerView.videoScrubber bounds]);
     interval = 0.5f * duration / width;
-    __weak VideoPlayerViewController *vpvc = self;
+    __weak VideoPlayerKit *vpvc = self;
     _scrubberTimeObserver = [_videoPlayer addPeriodicTimeObserverForInterval:CMTimeMakeWithSeconds(interval, NSEC_PER_SEC)
                                                                        queue:NULL
                                                                   usingBlock:^(CMTime time) {

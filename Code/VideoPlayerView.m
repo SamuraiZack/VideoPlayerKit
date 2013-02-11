@@ -123,7 +123,6 @@
     CGRect bounds = [self bounds];
 
     CGRect insetBounds = CGRectInset(UIEdgeInsetsInsetRect(bounds, self.controlsEdgeInsets), _padding, _padding);
-    
     CGSize titleLabelSize = [[_titleLabel text] sizeWithFont:[_titleLabel font]
                                            constrainedToSize:CGSizeMake(insetBounds.size.width, CGFLOAT_MAX)
                                                lineBreakMode:NSLineBreakByCharWrapping];
@@ -153,13 +152,13 @@
         self.autoresizingMask = UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight;
 
         [_titleLabel setFrame:CGRectMake(insetBounds.origin.x + self.padding,
-                                         insetBounds.origin.y + 30,
+                                         insetBounds.origin.y,
                                          insetBounds.size.width,
                                          titleLabelSize.height)];
         
         [_airplayIsActiveView setFrame:bounds];
         
-        [_shareButton setFrame:CGRectMake(insetBounds.size.width - shareImage.size.width, insetBounds.origin.y + 30, shareImage.size.width, shareImage.size.height)];
+        [_shareButton setFrame:CGRectMake(insetBounds.size.width - shareImage.size.width, insetBounds.origin.y, shareImage.size.width, shareImage.size.height)];
     }
     
     [_playerControlBar setFrame:CGRectMake(bounds.origin.x,

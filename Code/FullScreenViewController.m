@@ -22,7 +22,6 @@
 {
     self.fullScreenView = [[FullScreenView alloc] init];
     [self setView:self.fullScreenView];
-    [self setWantsFullScreenLayout:YES];
 }
 
 - (NSUInteger)supportedInterfaceOrientations
