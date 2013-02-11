@@ -3,7 +3,7 @@ Pod::Spec.new do |s|
   s.version  = '1.0.0'
   s.platform = :ios, '5.0'
   s.license  = { :type => 'BSD'}
-  s.summary  = 'An iOS video player'
+  s.summary  = 'An custom iOS video player with controls, progress bar, and airplay set up'
   s.homepage = 'https://github.com/SamuraiZack/VideoPlayerKit'
   s.author   = { 'Aung Thar' => 'samuraizack@gmail.com',
                  'Grant Bartone'  => 'gbartone@ign.com',
@@ -13,8 +13,9 @@ Pod::Spec.new do |s|
   s.source   = { :git => 'https://github.com/SamuraiZack/VideoPlayerKit.git', :tag => '1.0.0' }
 
   s.description  = 'We know how hard making a custom video player is. That is why ' \
-		   'we created VideoPlayerKit. Using VideoPlayerKit is easy and ' \
-		   'all controls are already set up to make everyone life easier.'
+		    'we created VideoPlayerKit. Using VideoPlayerKit is easy. All ' \
+		    'controls, progress bar, and airplay are already set up to make ' \
+		   'everyone life easier.'
   s.source_files = 'Code/*.{h,m}'
   s.resources    = 'Assets/*.png'
   s.frameworks    = 'AudioToolbox', 'CoreMedia', 'AVFoundation', 'MediaPlayer'

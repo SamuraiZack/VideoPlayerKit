@@ -1,18 +1,22 @@
 VideoPlayerKit
 ==============
 
-We know how hard making a custom video player is. That is why we created VideoPlayerKit. Using VideoPlayerKit is easy and all controls are already set up to make everyone life easier.
+We know how hard making a custom video player is. That is why we created VideoPlayerKit. Using VideoPlayerKit is easy to use. All controls, progress bar, and airplay are already set up to make everyone life easier.
 
 #Installation Instruction:
 
 ##In View Controller that will contain the video player:
 
-###Import VideoPlayerViewController.h
-    import "VideoPlayerViewController.h"
+###Import VideoPlayerKit.h
+    import "VideoPlayerKit.h"
 
 ###Initializing video player
-    initWithContainingViewController:optionalTopView:hideTopViewWithControls:
+    [VideoPlayerKit initWithContainingViewController:optionalTopView:hideTopViewWithControls:];
 Make sure that the view controller that contains the video player is passed into the first parameter. This is used when a modal fullscreen occurs. The optional top view is a view that will be at the top of the video player. This can be use to put any additional buttons or labels. The third parameter is a boolean that will be use to check if the top view should hide with the video player controls. If this is set to NO, it is still possible to hide the top view only on certain times given the situation using the two notifications: kVideoPlayerWillHideControlsNotification and kVideoPlayerWillShowControlsNotification.
+
+###Top View Edge Inset
+    setControlsEdgeInsets
+If a top view is set, use this to offset the controls so it accounts for the top view. Usually you'll only want to change the edge inset's top parameter but the option is left open to change it entirely.
 
 ###Playing video on player
     playVideoWithTitle:URL:videoID:isStreaming:playInFullScreen:
